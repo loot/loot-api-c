@@ -24,6 +24,8 @@
 
 #include "loot/c_api.h"
 
+#include <algorithm>
+
 #include <loot/api.h>
 
 #include "api/loot_db.h"
@@ -207,23 +209,12 @@ LOOT_C_API unsigned int loot_load_lists(loot_db * const db, const char * const m
   return loot_ok;
 }
 
-LOOT_C_API unsigned int loot_eval_lists(loot_db * const db, const unsigned int language) {
+LOOT_C_API unsigned int loot_eval_lists(loot_db * const db) {
   if (db == nullptr)
     return c_error(loot_error_invalid_args, "Null pointer passed.");
-  if (language != loot_lang_english
-      && language != loot_lang_spanish
-      && language != loot_lang_russian
-      && language != loot_lang_french
-      && language != loot_lang_chinese
-      && language != loot_lang_polish
-      && language != loot_lang_brazilian_portuguese
-      && language != loot_lang_finnish
-      && language != loot_lang_german
-      && language != loot_lang_danish)
-    return c_error(loot_error_invalid_args, "Invalid language code given.");
 
   try {
-    db->getDatabase()->EvalLists(loot::LanguageCode(language));
+    db->getDatabase()->EvalLists();
   } catch (loot::Error& e) {
     return c_error(e);
   } catch (std::exception& e) {
@@ -238,48 +229,34 @@ LOOT_C_API unsigned int loot_eval_lists(loot_db * const db, const unsigned int l
 ////////////////////////////////////
 
 LOOT_C_API unsigned int loot_sort_plugins(loot_db * const db,
-                                          const char * const ** const sortedPlugins,
-                                          size_t * const numPlugins) {
-  if (db == nullptr || sortedPlugins == nullptr || numPlugins == nullptr)
+                                          const char ** const plugins,
+                                          const size_t numPlugins) {
+  using std::begin;
+  using std::end;
+  using std::find;
+  using std::distance;
+
+  if (db == nullptr || plugins == nullptr)
     return c_error(loot_error_invalid_args, "Null pointer passed.");
 
-  //Initialise output.
-  *numPlugins = 0;
-  *sortedPlugins = nullptr;
+  if (numPlugins == 0)
+    return loot_ok;
 
   try {
-    auto plugins = db->getDatabase()->SortPlugins();
-    db->setPluginNames(plugins);
+    auto sortedPlugins = db->getDatabase()->SortPlugins(std::vector<std::string>(plugins, plugins + numPlugins));
+
+    std::sort(plugins, plugins + numPlugins, [&](const char * const a, const char * const b) {
+      auto aIt = find(begin(sortedPlugins), end(sortedPlugins), a);
+      auto bIt = find(begin(sortedPlugins), end(sortedPlugins), b);
+
+      return distance(begin(sortedPlugins), aIt) < distance(begin(sortedPlugins), bIt);
+    });
   } catch (Error &e) {
     return c_error(e);
   } catch (std::bad_alloc& e) {
     return c_error(loot_error_no_mem, e.what());
   } catch (std::exception& e) {
     return c_error(loot_error_sorting_error, e.what());
-  }
-
-  if (db->getPluginNames().empty())
-    return loot_ok;
-
-  *numPlugins = db->getPluginNames().size();
-  *sortedPlugins = &db->getPluginNames()[0];
-
-  return loot_ok;
-}
-
-LOOT_C_API unsigned int loot_apply_load_order(loot_db * const db,
-                                              const char * const * const loadOrder,
-                                              const size_t numPlugins) {
-  if (db == nullptr || loadOrder == nullptr)
-    return c_error(loot_error_invalid_args, "Null pointer passed.");
-
-  try {
-    auto plugins = std::vector<std::string>(loadOrder, loadOrder + numPlugins);
-    db->getDatabase()->ApplyLoadOrder(plugins);
-  } catch (Error &e) {
-    return c_error(e);
-  } catch (std::exception& e) {
-    return c_error(loot_error_liblo_error, e.what());
   }
 
   return loot_ok;
@@ -392,18 +369,31 @@ LOOT_C_API unsigned int loot_get_plugin_tags(loot_db * const db, const char * co
 // Returns the messages attached to the given plugin. Messages are valid until Load,
 // loot_destroy_db or loot_get_plugin_messages are next called. plugin is case-insensitive.
 // If no messages are attached, *messages will be nullptr and numMessages will equal 0.
-LOOT_C_API unsigned int loot_get_plugin_messages(loot_db * const db, const char * const plugin,
+LOOT_C_API unsigned int loot_get_plugin_messages(loot_db * const db,
+                                                 const char * const plugin,
+                                                 const unsigned int language,
                                                  const loot_message ** const messages,
                                                  size_t * const numMessages) {
   if (db == nullptr || plugin == nullptr || messages == nullptr || numMessages == nullptr)
     return c_error(loot_error_invalid_args, "Null pointer passed.");
+  if (language != loot_lang_english
+      && language != loot_lang_spanish
+      && language != loot_lang_russian
+      && language != loot_lang_french
+      && language != loot_lang_chinese
+      && language != loot_lang_polish
+      && language != loot_lang_brazilian_portuguese
+      && language != loot_lang_finnish
+      && language != loot_lang_german
+      && language != loot_lang_danish)
+    return c_error(loot_error_invalid_args, "Invalid language code given.");
 
   //Initialise output.
   *messages = nullptr;
   *numMessages = 0;
 
   try {
-    auto messages = db->getDatabase()->GetPluginMessages(plugin);
+    auto messages = db->getDatabase()->GetPluginMessages(plugin, loot::LanguageCode(language));
 
     if (messages.empty())
       return loot_ok;

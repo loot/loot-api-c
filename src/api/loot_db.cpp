@@ -41,10 +41,6 @@ const char * loot_db::getRevisionDateString() const {
   return revisionDate.c_str();
 }
 
-const std::vector<const char *>& loot_db::getPluginNames() const {
-  return cPluginNames;
-}
-
 const std::vector<const char *>& loot_db::getAddedTags() const {
   return addedTags;
 }
@@ -65,20 +61,6 @@ void loot_db::setRevisionDateString(const std::string& str) {
   revisionDate = str;
 }
 
-void loot_db::setPluginNames(const std::vector<std::string>& plugins) {
-  // First take copies of the C++ strings to store.
-  pluginNames = plugins;
-
-  // Now store their C strings.
-  cPluginNames.resize(pluginNames.size());
-  std::transform(begin(pluginNames),
-                 end(pluginNames),
-                 begin(cPluginNames),
-                 [](const std::string& pluginName) {
-    return pluginName.c_str();
-  });
-}
-
 void loot_db::setAddedTags(const std::set<std::string>& names) {
   addedTags.clear();
   for (const auto& name : names) {
@@ -93,7 +75,7 @@ void loot_db::setRemovedTags(const std::set<std::string>& names) {
   }
 }
 
-void loot_db::setPluginMessages(const std::vector<loot::PluginMessage>& pluginMessages) {
+void loot_db::setPluginMessages(const std::vector<loot::SimpleMessage>& pluginMessages) {
   cPluginMessages.resize(pluginMessages.size());
   pluginMessageStrings.resize(pluginMessages.size());
 
@@ -110,9 +92,6 @@ void loot_db::setPluginMessages(const std::vector<loot::PluginMessage>& pluginMe
 
 void loot_db::clearArrays() {
   bashTags.clear();
-
-  pluginNames.clear();
-  cPluginNames.clear();
 
   addedTags.clear();
   removedTags.clear();

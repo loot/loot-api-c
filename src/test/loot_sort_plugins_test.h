@@ -37,7 +37,7 @@ protected:
     sortedPlugins_(nullptr),
     numPlugins_(0) {}
 
-  const char * const * sortedPlugins_;
+  const char ** sortedPlugins_;
   size_t numPlugins_;
 };
 
@@ -52,14 +52,31 @@ INSTANTIATE_TEST_CASE_P(,
                           loot_game_fonv,
                           loot_game_fo4));
 
-TEST_P(loot_sort_plugins_test, shouldReturnAnInvalidArgsErrorIfAnyOfTheArgumentsAreNull) {
-  EXPECT_EQ(loot_error_invalid_args, loot_sort_plugins(NULL, &sortedPlugins_, &numPlugins_));
-  EXPECT_EQ(loot_error_invalid_args, loot_sort_plugins(db_, NULL, &numPlugins_));
-  EXPECT_EQ(loot_error_invalid_args, loot_sort_plugins(db_, &sortedPlugins_, NULL));
+TEST_P(loot_sort_plugins_test, shouldReturnAnInvalidArgsErrorIfAnyOfThePointerArgumentsAreNull) {
+  EXPECT_EQ(loot_error_invalid_args, loot_sort_plugins(NULL, sortedPlugins_, numPlugins_));
+  EXPECT_EQ(loot_error_invalid_args, loot_sort_plugins(db_, NULL, numPlugins_));
+}
+
+TEST_P(loot_sort_plugins_test, shouldSucceedIfTheNumPluginsArgumentIsZero) {
+  EXPECT_EQ(loot_error_invalid_args, loot_sort_plugins(db_, sortedPlugins_, 0));
 }
 
 TEST_P(loot_sort_plugins_test, shouldSucceedIfPassedValidArguments) {
-  std::list<std::string> expectedOrder = {
+  std::vector<const char *> sortedPlugins = {
+    blankDifferentMasterDependentEsp.c_str(),
+    blankEsp.c_str(),
+    blankPluginDependentEsp.c_str(),
+    blankDifferentEsp.c_str(),
+    blankDifferentPluginDependentEsp.c_str(),
+    masterFile.c_str(),
+    blankEsm.c_str(),
+    blankMasterDependentEsm.c_str(),
+    blankDifferentEsm.c_str(),
+    blankDifferentMasterDependentEsm.c_str(),
+    blankMasterDependentEsp.c_str(),
+  };
+
+  std::vector<std::string> expectedOrder = {
       masterFile,
       blankEsm,
       blankMasterDependentEsm,
@@ -76,14 +93,10 @@ TEST_P(loot_sort_plugins_test, shouldSucceedIfPassedValidArguments) {
   ASSERT_NO_THROW(GenerateMasterlist());
   ASSERT_EQ(loot_ok, loot_load_lists(db_, masterlistPath.string().c_str(), NULL));
 
-  EXPECT_EQ(loot_ok, loot_sort_plugins(db_, &sortedPlugins_, &numPlugins_));
+  EXPECT_EQ(loot_ok, loot_sort_plugins(db_, &sortedPlugins[0], sortedPlugins.size()));
 
-  ASSERT_EQ(expectedOrder.size(), numPlugins_);
-
-  size_t i = 0;
-  for (const auto& plugin : expectedOrder) {
-    EXPECT_EQ(plugin, sortedPlugins_[i]);
-    ++i;
+  for (size_t i = 0; i < expectedOrder.size(); ++i) {
+    EXPECT_EQ(expectedOrder[i], sortedPlugins[i]);
   }
 }
 }

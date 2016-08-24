@@ -45,42 +45,11 @@ INSTANTIATE_TEST_CASE_P(,
                           loot_game_fo4));
 
 TEST_P(loot_eval_lists_test, shouldReturnAnInvalidArgsErrorIfPassedANullPointer) {
-  EXPECT_EQ(loot_error_invalid_args, loot_eval_lists(NULL, loot_lang_english));
+  EXPECT_EQ(loot_error_invalid_args, loot_eval_lists(NULL));
 }
 
-TEST_P(loot_eval_lists_test, shouldReturnAnInvalidArgsErrorIfPassedAnInvalidLanguageCode) {
-  EXPECT_EQ(loot_error_invalid_args, loot_eval_lists(db_, UINT_MAX));
-}
-
-TEST_P(loot_eval_lists_test, shouldReturnOkForAllLanguagesWithNoListsLoaded) {
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_english));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_english));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_spanish));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_russian));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_french));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_chinese));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_polish));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_brazilian_portuguese));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_finnish));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_german));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_danish));
-}
-
-TEST_P(loot_eval_lists_test, shouldReturnOKForAllLanguagesWithAMasterlistLoaded) {
-  ASSERT_NO_THROW(GenerateMasterlist());
-  ASSERT_EQ(loot_ok, loot_load_lists(db_, masterlistPath.string().c_str(), NULL));
-
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_english));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_english));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_spanish));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_russian));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_french));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_chinese));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_polish));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_brazilian_portuguese));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_finnish));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_german));
-  EXPECT_EQ(loot_ok, loot_eval_lists(db_, loot_lang_danish));
+TEST_P(loot_eval_lists_test, shouldReturnOkIfDbPointerIsValid) {
+  EXPECT_EQ(loot_ok, loot_eval_lists(db_));
 }
 }
 }

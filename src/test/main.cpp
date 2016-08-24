@@ -24,7 +24,6 @@
 
 #include <gtest/gtest.h>
 
-#include "loot_apply_load_order_test.h"
 #include "loot_create_db_test.h"
 #include "loot_eval_lists_test.h"
 #include "loot_get_dirty_info_test.h"

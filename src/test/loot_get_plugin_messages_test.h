@@ -53,14 +53,18 @@ INSTANTIATE_TEST_CASE_P(,
                           loot_game_fo4));
 
 TEST_P(loot_get_plugin_messages_test, shouldReturnAnInvalidArgsErrorIfAnyOfTheArgumentsAreNull) {
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(NULL, blankEsp.c_str(), &messages_, &numMessages_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(db_, NULL, &messages_, &numMessages_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(db_, blankEsp.c_str(), NULL, &numMessages_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(db_, blankEsp.c_str(), &messages_, NULL));
+  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(NULL, blankEsp.c_str(), loot_lang_english, &messages_, &numMessages_));
+  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(db_, NULL, loot_lang_english, &messages_, &numMessages_));
+  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(db_, blankEsp.c_str(), loot_lang_english, NULL, &numMessages_));
+  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(db_, blankEsp.c_str(), loot_lang_english, &messages_, NULL));
+}
+
+TEST_P(loot_get_plugin_messages_test, shouldReturnAnInvalidArgsErrorIfTheLanguageIsInvalid) {
+  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(db_, blankEsp.c_str(), UINT_MAX, &messages_, &numMessages_));
 }
 
 TEST_P(loot_get_plugin_messages_test, shouldReturnOkAndOutputANullArrayIfAPluginWithNoMessagesIsQueried) {
-  EXPECT_EQ(loot_ok, loot_get_plugin_messages(db_, blankEsp.c_str(), &messages_, &numMessages_));
+  EXPECT_EQ(loot_ok, loot_get_plugin_messages(db_, blankEsp.c_str(), loot_lang_english, &messages_, &numMessages_));
   EXPECT_EQ(0, numMessages_);
   EXPECT_EQ(NULL, messages_);
 }
@@ -69,7 +73,7 @@ TEST_P(loot_get_plugin_messages_test, shouldReturnOkAndOutputANoteIfAPluginWithA
   ASSERT_NO_THROW(GenerateMasterlist());
   ASSERT_EQ(loot_ok, loot_load_lists(db_, masterlistPath.string().c_str(), NULL));
 
-  EXPECT_EQ(loot_ok, loot_get_plugin_messages(db_, blankEsm.c_str(), &messages_, &numMessages_));
+  EXPECT_EQ(loot_ok, loot_get_plugin_messages(db_, blankEsm.c_str(), loot_lang_english, &messages_, &numMessages_));
   ASSERT_EQ(1, numMessages_);
   EXPECT_EQ(loot_message_say, messages_[0].type);
   EXPECT_STREQ(noteMessage.c_str(), messages_[0].message);
@@ -79,7 +83,7 @@ TEST_P(loot_get_plugin_messages_test, shouldReturnOkAndOutputAWarningIfAPluginWi
   ASSERT_NO_THROW(GenerateMasterlist());
   ASSERT_EQ(loot_ok, loot_load_lists(db_, masterlistPath.string().c_str(), NULL));
 
-  EXPECT_EQ(loot_ok, loot_get_plugin_messages(db_, blankDifferentEsm.c_str(), &messages_, &numMessages_));
+  EXPECT_EQ(loot_ok, loot_get_plugin_messages(db_, blankDifferentEsm.c_str(), loot_lang_english, &messages_, &numMessages_));
   ASSERT_EQ(1, numMessages_);
   EXPECT_EQ(loot_message_warn, messages_[0].type);
   EXPECT_STREQ(warningMessage.c_str(), messages_[0].message);
@@ -89,7 +93,7 @@ TEST_P(loot_get_plugin_messages_test, shouldReturnOkAndOutputAnErrorIfAPluginWit
   ASSERT_NO_THROW(GenerateMasterlist());
   ASSERT_EQ(loot_ok, loot_load_lists(db_, masterlistPath.string().c_str(), NULL));
 
-  EXPECT_EQ(loot_ok, loot_get_plugin_messages(db_, blankDifferentEsp.c_str(), &messages_, &numMessages_));
+  EXPECT_EQ(loot_ok, loot_get_plugin_messages(db_, blankDifferentEsp.c_str(), loot_lang_english, &messages_, &numMessages_));
   ASSERT_EQ(1, numMessages_);
   EXPECT_EQ(loot_message_error, messages_[0].type);
   EXPECT_STREQ(errorMessage.c_str(), messages_[0].message);
@@ -99,7 +103,7 @@ TEST_P(loot_get_plugin_messages_test, shouldReturnOkAndOutputMultipleMessagesIfA
   ASSERT_NO_THROW(GenerateMasterlist());
   ASSERT_EQ(loot_ok, loot_load_lists(db_, masterlistPath.string().c_str(), NULL));
 
-  EXPECT_EQ(loot_ok, loot_get_plugin_messages(db_, blankDifferentMasterDependentEsp.c_str(), &messages_, &numMessages_));
+  EXPECT_EQ(loot_ok, loot_get_plugin_messages(db_, blankDifferentMasterDependentEsp.c_str(), loot_lang_english, &messages_, &numMessages_));
   ASSERT_EQ(3, numMessages_);
   EXPECT_EQ(loot_message_say, messages_[0].type);
   EXPECT_STREQ(noteMessage.c_str(), messages_[0].message);

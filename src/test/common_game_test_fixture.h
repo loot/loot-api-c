@@ -114,7 +114,7 @@ protected:
       }
       for (const auto& plugin : loadOrder)
         actual.push_back(plugin.second);
-    } else if (gameType == tes5) {
+    } else if (gameType == loot_game_tes5) {
       boost::filesystem::ifstream in(localPath / "loadorder.txt");
       while (in) {
         std::string line;
@@ -182,41 +182,35 @@ protected:
   const uint32_t blankEsmCrc;
 
 private:
-  static const unsigned int tes4 = 1;
-  static const unsigned int tes5 = 2;
-  static const unsigned int fo3 = 3;
-  static const unsigned int fonv = 4;
-  static const unsigned int fo4 = 5;
-
   inline boost::filesystem::path getLocalPath() const {
-    if (gameType == tes4)
+    if (gameType == loot_game_tes4)
       return "./local/Oblivion";
     else
       return "./local/Skyrim";
   }
 
   inline boost::filesystem::path getPluginsPath() const {
-    if (gameType == tes4)
+    if (gameType == loot_game_tes4)
       return "./Oblivion/Data";
     else
       return "./Skyrim/Data";
   }
 
   inline std::string getMasterFile() const {
-    if (gameType == tes4)
+    if (gameType == loot_game_tes4)
       return "Oblivion.esm";
-    else if (gameType == tes5)
+    else if (gameType == loot_game_tes5)
       return "Skyrim.esm";
-    else if (gameType == fo3)
+    else if (gameType == loot_game_fo3)
       return "Fallout3.esm";
-    else if (gameType == fonv)
+    else if (gameType == loot_game_fonv)
       return "FalloutNV.esm";
     else
       return "Fallout4.esm";
   }
 
   inline uint32_t getBlankEsmCrc() const {
-    if (gameType == tes4)
+    if (gameType == loot_game_tes4)
       return 0x374E2A6F;
     else
       return 0x187BE342;
@@ -225,9 +219,9 @@ private:
   void setLoadOrder(const std::vector<std::pair<std::string, bool>>& loadOrder) const {
     boost::filesystem::ofstream out(localPath / "plugins.txt");
     for (const auto &plugin : loadOrder) {
-      if (gameType == fo4 && plugin.second)
+      if (gameType == loot_game_fo4 && plugin.second)
         out << '*';
-      else if (gameType != fo4 && !plugin.second)
+      else if (gameType != loot_game_fo4 && !plugin.second)
         continue;
 
       out << plugin.first << std::endl;
@@ -243,7 +237,7 @@ private:
         }
         modificationTime += 60;
       }
-    } else if (gameType == tes5) {
+    } else if (gameType == loot_game_tes5) {
       boost::filesystem::ofstream out(localPath / "loadorder.txt");
       for (const auto &plugin : loadOrder)
         out << plugin.first << std::endl;
@@ -251,7 +245,7 @@ private:
   }
 
   inline static bool isLoadOrderTimestampBased(unsigned int gameId) {
-    return gameId == tes4 || gameId == fo3 || gameId == fonv;
+    return gameId == loot_game_tes4 || gameId == loot_game_fo3 || gameId == loot_game_fonv;
   }
 };
 }

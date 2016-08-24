@@ -461,8 +461,7 @@ extern "C"
      *      The language code that is used for message language comparisons.
      *  @returns A return code.
      */
-  LOOT_C_API unsigned int loot_eval_lists(loot_db * const db,
-                                          const unsigned int language);
+  LOOT_C_API unsigned int loot_eval_lists(loot_db * const db);
 
     /**********************************************************************//**
      *  @name LOOT Functionality Functions
@@ -478,30 +477,17 @@ extern "C"
      *           not load or evaluate the masterlist or userlist.
      *  @param db
      *      The database the function acts on.
-     *  @param sortedPlugins
-     *      A pointer to an array of plugin filenames in their sorted load
-     *      order.
+     *  @param plugins
+     *      A pointer to an array of plugin filenames to be sorted. If sorting
+     *      is successful, this array will be modified to list the plugins in
+     *      their sorted load order without reallocating memory.
      *  @param numPlugins
-     *      A pointer to the size of the outputted array.
+     *      A pointer to the size of the `sortedPlugins` array.
      *  @returns A return code.
      */
   LOOT_C_API unsigned int loot_sort_plugins(loot_db * const db,
-                                            const char * const ** const sortedPlugins,
-                                            size_t * const numPlugins);
-
-    /**
-     *  @brief Applies the given load order.
-     *  @param db
-     *      The database the function acts on.
-     *  @param loadOrder
-     *      An array of plugin filenames in the load order to be set.
-     *  @param numPlugins
-     *      The size of the inputted array.
-     *  @returns A return code.
-     */
-  LOOT_C_API unsigned int loot_apply_load_order(loot_db * const db,
-                                                const char * const * const loadOrder,
-                                                const size_t numPlugins);
+                                            const char ** const plugins,
+                                            const size_t numPlugins);
 
     /**
      *  @brief Update the given masterlist.
@@ -627,6 +613,8 @@ extern "C"
      *      The database the function acts on.
      *  @param plugin
      *      The filename of the plugin to look up messages for.
+     *  @param plugin
+     *      The preferred language for messages.
      *  @param messages
      *      A pointer to the outputted array of messages associated with the
      *      specified plugin, given as loot_message structures. `NULL` if the
@@ -638,6 +626,7 @@ extern "C"
      */
   LOOT_C_API unsigned int loot_get_plugin_messages(loot_db * const db,
                                                    const char * const plugin,
+                                                   const unsigned int language,
                                                    const loot_message ** const messages,
                                                    size_t * const numMessages);
 

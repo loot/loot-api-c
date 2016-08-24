@@ -41,8 +41,6 @@ struct loot_db {
   const char * getRevisionIdString() const;
   const char * getRevisionDateString() const;
 
-  const std::vector<const char *>& getPluginNames() const;
-
   const std::vector<const char *>& getAddedTags() const;
   const std::vector<const char *>& getRemovedTags() const;
 
@@ -51,12 +49,10 @@ struct loot_db {
   void setRevisionIdString(const std::string& str);
   void setRevisionDateString(const std::string& str);
 
-  void setPluginNames(const std::vector<std::string>& plugins);
-
   void setAddedTags(const std::set<std::string>& names);
   void setRemovedTags(const std::set<std::string>& names);
 
-  void setPluginMessages(const std::vector<loot::PluginMessage>& pluginMessages);
+  void setPluginMessages(const std::vector<loot::SimpleMessage>& pluginMessages);
 
   void clearArrays();
 private:
@@ -66,9 +62,6 @@ private:
 
   std::string revisionId;
   std::string revisionDate;
-
-  std::vector<std::string> pluginNames;
-  std::vector<const char *> cPluginNames;
 
   std::unordered_set<std::string> bashTags;
   std::vector<const char *> addedTags;

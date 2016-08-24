@@ -50,7 +50,7 @@ ExternalProject_Add(testing-plugins
 
 ExternalProject_Add(loot_api
                     PREFIX "external"
-                    URL "https://github.com/loot/loot/archive/5982136f71cd026ecf80a7b6c7b9dd53e0dcb8d5.zip"
+                    URL "https://github.com/loot/loot/archive/dc3a93ecf331465b17a28ac39e6c17370438331b.zip"
                     CMAKE_ARGS -DBOOST_INCLUDEDIR=${Boost_INCLUDE_DIR} -DMSVC_STATIC_RUNTIME=${MSVC_STATIC_RUNTIME} -DBUILD_SHARED_LIBS=OFF
                     BUILD_COMMAND ${CMAKE_COMMAND} --build . --target loot_api --config $(CONFIGURATION)
                     INSTALL_COMMAND "")
@@ -95,7 +95,6 @@ set(LOOT_C_API_TESTS_HEADERS  "${CMAKE_SOURCE_DIR}/src/test/api_game_operations_
 set(LOOT_C_API_TESTS_SRC "${CMAKE_SOURCE_DIR}/src/test/main.cpp")
 
 set(LOOT_C_API_TESTS_HEADERS  "${CMAKE_SOURCE_DIR}/src/test/api_game_operations_test.h"
-                            "${CMAKE_SOURCE_DIR}/src/test/loot_apply_load_order_test.h"
                             "${CMAKE_SOURCE_DIR}/src/test/loot_create_db_test.h"
                             "${CMAKE_SOURCE_DIR}/src/test/loot_eval_lists_test.h"
                             "${CMAKE_SOURCE_DIR}/src/test/loot_get_dirty_info_test.h"
