@@ -78,20 +78,20 @@ TEST_P(loot_create_db_test, shouldSucceedIfPassedValidParametersWithAbsolutePath
   EXPECT_NE(nullptr, db_);
 }
 
-TEST_P(loot_create_db_test, shouldReturnAnInvalidArgsErrorIfPassedANullPointer) {
-  EXPECT_EQ(loot_error_invalid_args, loot_create_db(NULL, GetParam(), dataPath.parent_path().string().c_str(), localPath.string().c_str()));
+TEST_P(loot_create_db_test, shouldReturnAnArgumentErrorIfPassedANullPointer) {
+  EXPECT_EQ(loot_error_argument, loot_create_db(NULL, GetParam(), dataPath.parent_path().string().c_str(), localPath.string().c_str()));
 }
 
-TEST_P(loot_create_db_test, shouldReturnAnInvalidArgsErrorIfPassedAnInvalidGameType) {
-  EXPECT_EQ(loot_error_invalid_args, loot_create_db(&db_, UINT_MAX, dataPath.parent_path().string().c_str(), localPath.string().c_str()));
+TEST_P(loot_create_db_test, shouldReturnAnArgumentErrorIfPassedAnInvalidGameType) {
+  EXPECT_EQ(loot_error_argument, loot_create_db(&db_, UINT_MAX, dataPath.parent_path().string().c_str(), localPath.string().c_str()));
 }
 
-TEST_P(loot_create_db_test, shouldReturnAnInvalidArgsErrorIfPassedAGamePathThatDoesNotExist) {
-  EXPECT_EQ(loot_error_invalid_args, loot_create_db(&db_, GetParam(), missingPath.string().c_str(), localPath.string().c_str()));
+TEST_P(loot_create_db_test, shouldReturnAnArgumentErrorIfPassedAGamePathThatDoesNotExist) {
+  EXPECT_EQ(loot_error_argument, loot_create_db(&db_, GetParam(), missingPath.string().c_str(), localPath.string().c_str()));
 }
 
-TEST_P(loot_create_db_test, shouldReturnAnInvalidArgsErrorIfPassedALocalPathThatDoesNotExist) {
-  EXPECT_EQ(loot_error_invalid_args, loot_create_db(&db_, GetParam(), dataPath.parent_path().string().c_str(), missingPath.string().c_str()));
+TEST_P(loot_create_db_test, shouldReturnAnArgumentErrorIfPassedALocalPathThatDoesNotExist) {
+  EXPECT_EQ(loot_error_argument, loot_create_db(&db_, GetParam(), dataPath.parent_path().string().c_str(), missingPath.string().c_str()));
 }
 
 #ifdef _WIN32

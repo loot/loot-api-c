@@ -61,36 +61,36 @@ INSTANTIATE_TEST_CASE_P(,
                           loot_game_fonv,
                           loot_game_fo4));
 
-TEST_P(loot_update_masterlist_test, shouldReturnAnInvalidArgsErrorIfAnyOfTheArgumentsAreNull) {
-  EXPECT_EQ(loot_error_invalid_args, loot_update_masterlist(NULL, masterlistPath.string().c_str(), url_.c_str(), branch_.c_str(), &updated_));
-  EXPECT_EQ(loot_error_invalid_args, loot_update_masterlist(db_, NULL, url_.c_str(), branch_.c_str(), &updated_));
-  EXPECT_EQ(loot_error_invalid_args, loot_update_masterlist(db_, masterlistPath.string().c_str(), NULL, branch_.c_str(), &updated_));
-  EXPECT_EQ(loot_error_invalid_args, loot_update_masterlist(db_, masterlistPath.string().c_str(), url_.c_str(), NULL, &updated_));
-  EXPECT_EQ(loot_error_invalid_args, loot_update_masterlist(db_, masterlistPath.string().c_str(), url_.c_str(), branch_.c_str(), NULL));
+TEST_P(loot_update_masterlist_test, shouldReturnAnArgumentErrorIfAnyOfTheArgumentsAreNull) {
+  EXPECT_EQ(loot_error_argument, loot_update_masterlist(NULL, masterlistPath.string().c_str(), url_.c_str(), branch_.c_str(), &updated_));
+  EXPECT_EQ(loot_error_argument, loot_update_masterlist(db_, NULL, url_.c_str(), branch_.c_str(), &updated_));
+  EXPECT_EQ(loot_error_argument, loot_update_masterlist(db_, masterlistPath.string().c_str(), NULL, branch_.c_str(), &updated_));
+  EXPECT_EQ(loot_error_argument, loot_update_masterlist(db_, masterlistPath.string().c_str(), url_.c_str(), NULL, &updated_));
+  EXPECT_EQ(loot_error_argument, loot_update_masterlist(db_, masterlistPath.string().c_str(), url_.c_str(), branch_.c_str(), NULL));
 }
 
-TEST_P(loot_update_masterlist_test, shouldReturnAnInvalidArgsErrorIfTheMasterlistPathGivenIsInvalid) {
-  EXPECT_EQ(loot_error_invalid_args, loot_update_masterlist(db_, ";//\?", url_.c_str(), branch_.c_str(), &updated_));
+TEST_P(loot_update_masterlist_test, shouldReturnAnArgumentErrorIfTheMasterlistPathGivenIsInvalid) {
+  EXPECT_EQ(loot_error_argument, loot_update_masterlist(db_, ";//\?", url_.c_str(), branch_.c_str(), &updated_));
 }
 
-TEST_P(loot_update_masterlist_test, shouldReturnAnInvalidArgsErrorIfTheMasterlistPathGivenIsEmpty) {
-  EXPECT_EQ(loot_error_invalid_args, loot_update_masterlist(db_, "", url_.c_str(), branch_.c_str(), &updated_));
+TEST_P(loot_update_masterlist_test, shouldReturnAnArgumentErrorIfTheMasterlistPathGivenIsEmpty) {
+  EXPECT_EQ(loot_error_argument, loot_update_masterlist(db_, "", url_.c_str(), branch_.c_str(), &updated_));
 }
 
-TEST_P(loot_update_masterlist_test, shouldReturnAGitErrorIfTheRepositoryUrlGivenCannotBeFound) {
-  EXPECT_EQ(loot_error_git_error, loot_update_masterlist(db_, masterlistPath.string().c_str(), "https://github.com/loot/oblivion-does-not-exist.git", branch_.c_str(), &updated_));
+TEST_P(loot_update_masterlist_test, shouldReturnALibgitErrorIfTheRepositoryUrlGivenCannotBeFound) {
+  EXPECT_EQ(loot_error_libgit2, loot_update_masterlist(db_, masterlistPath.string().c_str(), "https://github.com/loot/oblivion-does-not-exist.git", branch_.c_str(), &updated_));
 }
 
-TEST_P(loot_update_masterlist_test, shouldReturnAnInvalidArgsErrorIfTheRepositoryUrlGivenIsEmpty) {
-  EXPECT_EQ(loot_error_invalid_args, loot_update_masterlist(db_, masterlistPath.string().c_str(), "", branch_.c_str(), &updated_));
+TEST_P(loot_update_masterlist_test, shouldReturnAnArgumentErrorIfTheRepositoryUrlGivenIsEmpty) {
+  EXPECT_EQ(loot_error_argument, loot_update_masterlist(db_, masterlistPath.string().c_str(), "", branch_.c_str(), &updated_));
 }
 
-TEST_P(loot_update_masterlist_test, shouldReturnAGitErrorIfTheRepositoryBranchGivenCannotBeFound) {
-  EXPECT_EQ(loot_error_git_error, loot_update_masterlist(db_, masterlistPath.string().c_str(), url_.c_str(), "missing-branch", &updated_));
+TEST_P(loot_update_masterlist_test, shouldReturnALibgitErrorIfTheRepositoryBranchGivenCannotBeFound) {
+  EXPECT_EQ(loot_error_libgit2, loot_update_masterlist(db_, masterlistPath.string().c_str(), url_.c_str(), "missing-branch", &updated_));
 }
 
-TEST_P(loot_update_masterlist_test, shouldReturnAnInvalidArgsErrorIfTheRepositoryBranchGivenIsEmpty) {
-  EXPECT_EQ(loot_error_invalid_args, loot_update_masterlist(db_, masterlistPath.string().c_str(), url_.c_str(), "", &updated_));
+TEST_P(loot_update_masterlist_test, shouldReturnAnArgumentErrorIfTheRepositoryBranchGivenIsEmpty) {
+  EXPECT_EQ(loot_error_argument, loot_update_masterlist(db_, masterlistPath.string().c_str(), url_.c_str(), "", &updated_));
 }
 
 TEST_P(loot_update_masterlist_test, shouldSucceedIfPassedValidParametersAndOutputTrueIfTheMasterlistWasUpdated) {

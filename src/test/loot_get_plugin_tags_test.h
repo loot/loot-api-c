@@ -58,14 +58,14 @@ INSTANTIATE_TEST_CASE_P(,
                           loot_game_fonv,
                           loot_game_fo4));
 
-TEST_P(loot_get_plugin_tags_test, shouldReturnAnInvalidArgsErrorIfAnyOfTheArgumentsAreNull) {
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_tags(NULL, blankEsm.c_str(), &added_, &numAdded_, &removed_, &numRemoved_, &modified_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_tags(db_, NULL, &added_, &numAdded_, &removed_, &numRemoved_, &modified_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_tags(db_, blankEsm.c_str(), NULL, &numAdded_, &removed_, &numRemoved_, &modified_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_tags(db_, blankEsm.c_str(), &added_, NULL, &removed_, &numRemoved_, &modified_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_tags(db_, blankEsm.c_str(), &added_, &numAdded_, NULL, &numRemoved_, &modified_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_tags(db_, blankEsm.c_str(), &added_, &numAdded_, &removed_, NULL, &modified_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_tags(db_, blankEsm.c_str(), &added_, &numAdded_, &removed_, &numRemoved_, NULL));
+TEST_P(loot_get_plugin_tags_test, shouldReturnAnArgumentErrorIfAnyOfTheArgumentsAreNull) {
+  EXPECT_EQ(loot_error_argument, loot_get_plugin_tags(NULL, blankEsm.c_str(), &added_, &numAdded_, &removed_, &numRemoved_, &modified_));
+  EXPECT_EQ(loot_error_argument, loot_get_plugin_tags(db_, NULL, &added_, &numAdded_, &removed_, &numRemoved_, &modified_));
+  EXPECT_EQ(loot_error_argument, loot_get_plugin_tags(db_, blankEsm.c_str(), NULL, &numAdded_, &removed_, &numRemoved_, &modified_));
+  EXPECT_EQ(loot_error_argument, loot_get_plugin_tags(db_, blankEsm.c_str(), &added_, NULL, &removed_, &numRemoved_, &modified_));
+  EXPECT_EQ(loot_error_argument, loot_get_plugin_tags(db_, blankEsm.c_str(), &added_, &numAdded_, NULL, &numRemoved_, &modified_));
+  EXPECT_EQ(loot_error_argument, loot_get_plugin_tags(db_, blankEsm.c_str(), &added_, &numAdded_, &removed_, NULL, &modified_));
+  EXPECT_EQ(loot_error_argument, loot_get_plugin_tags(db_, blankEsm.c_str(), &added_, &numAdded_, &removed_, &numRemoved_, NULL));
 }
 
 TEST_P(loot_get_plugin_tags_test, shouldReturnOkAndOutputEmptyNonModifiedArraysIfAPluginWithoutTagsIsQueried) {

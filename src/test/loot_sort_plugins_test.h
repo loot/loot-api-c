@@ -52,13 +52,13 @@ INSTANTIATE_TEST_CASE_P(,
                           loot_game_fonv,
                           loot_game_fo4));
 
-TEST_P(loot_sort_plugins_test, shouldReturnAnInvalidArgsErrorIfAnyOfThePointerArgumentsAreNull) {
-  EXPECT_EQ(loot_error_invalid_args, loot_sort_plugins(NULL, sortedPlugins_, numPlugins_));
-  EXPECT_EQ(loot_error_invalid_args, loot_sort_plugins(db_, NULL, numPlugins_));
+TEST_P(loot_sort_plugins_test, shouldReturnAnArgumentErrorIfAnyOfThePointerArgumentsAreNull) {
+  EXPECT_EQ(loot_error_argument, loot_sort_plugins(NULL, sortedPlugins_, numPlugins_));
+  EXPECT_EQ(loot_error_argument, loot_sort_plugins(db_, NULL, numPlugins_));
 }
 
-TEST_P(loot_sort_plugins_test, shouldSucceedIfTheNumPluginsArgumentIsZero) {
-  EXPECT_EQ(loot_error_invalid_args, loot_sort_plugins(db_, sortedPlugins_, 0));
+TEST_P(loot_sort_plugins_test, shouldReturnAnArgumentErrorIfTheNumPluginsArgumentIsZero) {
+  EXPECT_EQ(loot_error_argument, loot_sort_plugins(db_, sortedPlugins_, 0));
 }
 
 TEST_P(loot_sort_plugins_test, shouldSucceedIfPassedValidArguments) {

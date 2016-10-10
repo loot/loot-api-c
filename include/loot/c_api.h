@@ -239,19 +239,18 @@ extern "C"
   /**@{*/
 
   LOOT_C_API extern const unsigned int loot_ok;  /**< The function completed successfully. */
-  LOOT_C_API extern const unsigned int loot_error_liblo_error;  /**< There was an error in performing a load order operation. */
-  LOOT_C_API extern const unsigned int loot_error_file_write_fail;  /**< A file could not be written to. */
-  LOOT_C_API extern const unsigned int loot_error_parse_fail;  /**< There was an error parsing the file. */
-  LOOT_C_API extern const unsigned int loot_error_condition_eval_fail;  /**< There was an error evaluating the conditionals in a metadata file. */
-  LOOT_C_API extern const unsigned int loot_error_regex_eval_fail;  /**< There was an error evaluating the regular expressions in a metadata file. */
-  LOOT_C_API extern const unsigned int loot_error_no_mem;  /**< The API was unable to allocate the required memory. */
-  LOOT_C_API extern const unsigned int loot_error_invalid_args;  /**< Invalid arguments were given for the function. */
-  LOOT_C_API extern const unsigned int loot_error_no_tag_map;  /**< No Bash Tag map has been generated yet. */
-  LOOT_C_API extern const unsigned int loot_error_path_not_found;  /**< A file or folder path could not be found. */
-  LOOT_C_API extern const unsigned int loot_error_no_game_detected;  /**< The given game could not be found. */
-  LOOT_C_API extern const unsigned int loot_error_git_error;  /**< An error occurred while performing a git operation (updating or getting the masterlist version). */
-  LOOT_C_API extern const unsigned int loot_error_windows_error;  /**< An error occurred during a call to the Windows API. */
-  LOOT_C_API extern const unsigned int loot_error_sorting_error;  /**< An error occurred while sorting plugins. */
+  LOOT_C_API extern const unsigned int loot_error_unknown;  /**< An unknown error occurred. */
+  LOOT_C_API extern const unsigned int loot_error_file_access;  /**< A file could not be accessed. */
+  LOOT_C_API extern const unsigned int loot_error_condition_syntax;  /**< There was an error parsing a metadata condition. */
+  LOOT_C_API extern const unsigned int loot_error_regex_syntax;  /**< There was an error parsing a regular expression. */
+  LOOT_C_API extern const unsigned int loot_error_game_detection;  /**< The given game could not be found. */
+  LOOT_C_API extern const unsigned int loot_error_libloadorder;  /**< There was an error in performing a load order operation. */
+  LOOT_C_API extern const unsigned int loot_error_libgit2;  /**< An error occurred while performing a git operation (updating or getting the masterlist version). */
+  LOOT_C_API extern const unsigned int loot_error_os;   /**< An error occurred during a call to an operating system API. */
+  LOOT_C_API extern const unsigned int loot_error_cyclic_interaction;  /**< A cyclic interaction was found while sorting plugins. */
+  LOOT_C_API extern const unsigned int loot_error_git_state;  /**< An error occurred while performing a git operation (updating or getting the masterlist version). */
+  LOOT_C_API extern const unsigned int loot_error_no_memory;  /**< The API was unable to allocate the required memory. */
+  LOOT_C_API extern const unsigned int loot_error_argument;  /**< Invalid arguments were given for the function. */
 
   /**
    *  @brief Matches the value of the highest-numbered return code.

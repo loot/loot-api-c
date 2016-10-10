@@ -57,18 +57,18 @@ INSTANTIATE_TEST_CASE_P(,
                           loot_game_fonv,
                           loot_game_fo4));
 
-TEST_P(loot_load_lists_test, shouldReturnAnInvalidArgsErrorIfTheDbOrMasterlistPathArgumentsAreNull) {
-  EXPECT_EQ(loot_error_invalid_args, loot_load_lists(NULL, masterlistPath.string().c_str(), NULL));
-  EXPECT_EQ(loot_error_invalid_args, loot_load_lists(db_, NULL, NULL));
+TEST_P(loot_load_lists_test, shouldReturnAnInvalidArgumentErrorIfTheDbOrMasterlistPathArgumentsAreNull) {
+  EXPECT_EQ(loot_error_argument, loot_load_lists(NULL, masterlistPath.string().c_str(), NULL));
+  EXPECT_EQ(loot_error_argument, loot_load_lists(db_, NULL, NULL));
 }
 
-TEST_P(loot_load_lists_test, shouldReturnAPathNotFoundErrorIfNoMasterlistIsPresent) {
-  EXPECT_EQ(loot_error_path_not_found, loot_load_lists(db_, masterlistPath.string().c_str(), NULL));
+TEST_P(loot_load_lists_test, shouldReturnAFileAccessErrorIfNoMasterlistIsPresent) {
+  EXPECT_EQ(loot_error_file_access, loot_load_lists(db_, masterlistPath.string().c_str(), NULL));
 }
 
-TEST_P(loot_load_lists_test, shouldReturnAPathNotFoundErrorIfAMasterlistIsPresentButAUserlistDoesNotExistAtTheGivenPath) {
+TEST_P(loot_load_lists_test, shouldReturnAFileAccessErrorIfAMasterlistIsPresentButAUserlistDoesNotExistAtTheGivenPath) {
   ASSERT_NO_THROW(GenerateMasterlist());
-  EXPECT_EQ(loot_error_path_not_found, loot_load_lists(db_, masterlistPath.string().c_str(), userlistPath.string().c_str()));
+  EXPECT_EQ(loot_error_file_access, loot_load_lists(db_, masterlistPath.string().c_str(), userlistPath.string().c_str()));
 }
 
 TEST_P(loot_load_lists_test, shouldReturnOkIfTheMasterlistAndUserlistAreBothPresent) {

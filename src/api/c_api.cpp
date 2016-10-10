@@ -25,31 +25,30 @@
 #include "loot/c_api.h"
 
 #include <algorithm>
+#include <regex>
 
 #include <loot/api.h>
 
 #include "api/loot_db.h"
 
-using loot::Error;
 using loot::GameType;
 using loot::MessageType;
 using loot::LanguageCode;
 
-const unsigned int loot_ok = Error::asUnsignedInt(Error::Code::ok);
-const unsigned int loot_error_liblo_error = Error::asUnsignedInt(Error::Code::liblo_error);
-const unsigned int loot_error_file_write_fail = Error::asUnsignedInt(Error::Code::path_write_fail);
-const unsigned int loot_error_parse_fail = Error::asUnsignedInt(Error::Code::path_read_fail);
-const unsigned int loot_error_condition_eval_fail = Error::asUnsignedInt(Error::Code::condition_eval_fail);
-const unsigned int loot_error_regex_eval_fail = Error::asUnsignedInt(Error::Code::regex_eval_fail);
-const unsigned int loot_error_no_mem = Error::asUnsignedInt(Error::Code::no_mem);
-const unsigned int loot_error_invalid_args = Error::asUnsignedInt(Error::Code::invalid_args);
-const unsigned int loot_error_no_tag_map = Error::asUnsignedInt(Error::Code::no_tag_map);
-const unsigned int loot_error_path_not_found = Error::asUnsignedInt(Error::Code::path_not_found);
-const unsigned int loot_error_no_game_detected = Error::asUnsignedInt(Error::Code::no_game_detected);
-const unsigned int loot_error_git_error = Error::asUnsignedInt(Error::Code::git_error);
-const unsigned int loot_error_windows_error = Error::asUnsignedInt(Error::Code::windows_error);
-const unsigned int loot_error_sorting_error = Error::asUnsignedInt(Error::Code::sorting_error);
-const unsigned int loot_return_max = loot_error_sorting_error;
+const unsigned int loot_ok = 0;
+const unsigned int loot_error_unknown = 1;
+const unsigned int loot_error_file_access = 2;
+const unsigned int loot_error_condition_syntax = 3;
+const unsigned int loot_error_regex_syntax = 4;
+const unsigned int loot_error_game_detection = 5;
+const unsigned int loot_error_libloadorder = 6;
+const unsigned int loot_error_libgit2 = 7;
+const unsigned int loot_error_os = 8;
+const unsigned int loot_error_cyclic_interaction = 9;
+const unsigned int loot_error_git_state = 10;
+const unsigned int loot_error_no_memory = 11;
+const unsigned int loot_error_argument = 12;
+const unsigned int loot_return_max = loot_error_argument;
 
 // The following are the games identifiers used by the API.
 const unsigned int loot_game_tes4 = static_cast<unsigned int>(GameType::tes4);
@@ -83,13 +82,44 @@ const unsigned int loot_cleanliness_unknown = static_cast<unsigned int>(loot::Pl
 
 std::string extMessageStr;
 
-unsigned int c_error(const Error& e) {
-  extMessageStr = e.what();
-  return e.codeAsUnsignedInt();
+unsigned int c_error(const unsigned int code, const std::string& what) {
+  extMessageStr = what;
+  return code;
 }
 
-unsigned int c_error(const unsigned int code, const std::string& what) {
-  return c_error(Error(Error::Code(code), what.c_str()));
+unsigned int c_error(std::exception_ptr exceptionPtr) {
+  try {
+    std::rethrow_exception(exceptionPtr);
+  } catch (loot::CyclicInteractionError& e) {
+    return c_error(loot_error_cyclic_interaction, e.what());
+  } catch (loot::GitStateError& e) {
+    return c_error(loot_error_git_state, e.what());
+  } catch (loot::GameDetectionError& e) {
+    return c_error(loot_error_game_detection, e.what());
+  } catch (loot::ConditionSyntaxError& e) {
+    return c_error(loot_error_condition_syntax, e.what());
+  } catch (loot::FileAccessError& e) {
+    return c_error(loot_error_file_access, e.what());
+  } catch (std::ios_base::failure& e) {
+    return c_error(loot_error_file_access, e.what());
+  } catch (std::system_error& e) {
+    if (e.code().category() == std::system_category())
+      return c_error(loot_error_os, e.what());
+    else if (e.code().category() == loot::libgit2_category())
+      return c_error(loot_error_libgit2, e.what());
+    else if (e.code().category() == loot::libloadorder_category())
+      return c_error(loot_error_libloadorder, e.what());
+    else
+      return c_error(loot_error_unknown, e.what());
+  } catch (std::regex_error& e) {
+    return c_error(loot_error_regex_syntax, e.what());
+  } catch (std::invalid_argument& e) {
+    return c_error(loot_error_argument, e.what());
+  } catch (std::bad_alloc& e) {
+    return c_error(loot_error_no_memory, e.what());
+  } catch (std::exception& e) {
+    return c_error(loot_error_unknown, e.what());
+  }
 }
 
 //////////////////////////////
@@ -101,7 +131,7 @@ unsigned int c_error(const unsigned int code, const std::string& what) {
 // until this function is called again or until CleanUpAPI is called.
 LOOT_C_API unsigned int loot_get_error_message(const char ** const message) {
   if (message == nullptr)
-    return c_error(loot_error_invalid_args, "Null message pointer passed.");
+    return c_error(loot_error_argument, "Null message pointer passed.");
 
   *message = extMessageStr.c_str();
 
@@ -118,7 +148,7 @@ LOOT_C_API bool loot_is_compatible(const unsigned int versionMajor, const unsign
 
 LOOT_C_API unsigned int loot_get_version(unsigned int * const versionMajor, unsigned int * const versionMinor, unsigned int * const versionPatch) {
   if (versionMajor == nullptr || versionMinor == nullptr || versionPatch == nullptr)
-    return c_error(loot_error_invalid_args, "Null pointer passed.");
+    return c_error(loot_error_argument, "Null pointer passed.");
 
   *versionMajor = loot::LootVersion::major;
   *versionMinor = loot::LootVersion::minor;
@@ -129,7 +159,7 @@ LOOT_C_API unsigned int loot_get_version(unsigned int * const versionMajor, unsi
 
 LOOT_C_API unsigned int loot_get_build_id(const char ** const revision) {
   if (revision == nullptr)
-    return c_error(loot_error_invalid_args, "Null message pointer passed.");
+    return c_error(loot_error_argument, "Null message pointer passed.");
 
   *revision = loot::LootVersion::revision.c_str();
 
@@ -144,13 +174,8 @@ LOOT_C_API unsigned int loot_create_db(loot_db ** const db,
                                        const unsigned int clientGame,
                                        const char * const gamePath,
                                        const char * const gameLocalPath) {
-  if (db == nullptr
-      || (clientGame != loot_game_tes4
-          && clientGame != loot_game_tes5
-          && clientGame != loot_game_fo3
-          && clientGame != loot_game_fonv
-          && clientGame != loot_game_fo4))
-    return c_error(loot_error_invalid_args, "Null pointer passed.");
+  if (db == nullptr)
+    return c_error(loot_error_argument, "Null pointer passed.");
 
   std::string game_path = "";
   if (gamePath != nullptr)
@@ -161,17 +186,13 @@ LOOT_C_API unsigned int loot_create_db(loot_db ** const db,
     game_local_path = gameLocalPath;
 #ifndef _WIN32
   else
-    return c_error(loot_error_invalid_args, "A local data path must be supplied on non-Windows platforms.");
+    return c_error(loot_error_argument, "A local data path must be supplied on non-Windows platforms.");
 #endif
 
   try {
     *db = new loot_db(loot::GameType(clientGame), game_path, game_local_path);
-  } catch (Error& e) {
-    return c_error(e);
-  } catch (std::bad_alloc& e) {
-    return c_error(loot_error_no_mem, e.what());
-  } catch (std::exception& e) {
-    return c_error(loot_error_invalid_args, e.what());
+  } catch (std::exception&) {
+    return c_error(std::current_exception());
   }
 
   return loot_ok;
@@ -189,7 +210,7 @@ LOOT_C_API void     loot_destroy_db(loot_db * const db) {
 LOOT_C_API unsigned int loot_load_lists(loot_db * const db, const char * const masterlistPath,
                                         const char * const userlistPath) {
   if (db == nullptr || masterlistPath == nullptr)
-    return c_error(loot_error_invalid_args, "Null pointer passed.");
+    return c_error(loot_error_argument, "Null pointer passed.");
 
   try {
     std::string userlistPathString;
@@ -197,10 +218,8 @@ LOOT_C_API unsigned int loot_load_lists(loot_db * const db, const char * const m
       userlistPathString = userlistPath;
 
     db->getDatabase()->LoadLists(masterlistPath, userlistPathString);
-  } catch (Error& e) {
-    return c_error(e);
-  } catch (std::exception& e) {
-    return c_error(loot_error_parse_fail, e.what());
+  } catch (std::exception&) {
+    return c_error(std::current_exception());
   }
 
   //Also free memory.
@@ -211,14 +230,12 @@ LOOT_C_API unsigned int loot_load_lists(loot_db * const db, const char * const m
 
 LOOT_C_API unsigned int loot_eval_lists(loot_db * const db) {
   if (db == nullptr)
-    return c_error(loot_error_invalid_args, "Null pointer passed.");
+    return c_error(loot_error_argument, "Null pointer passed.");
 
   try {
     db->getDatabase()->EvalLists();
-  } catch (loot::Error& e) {
-    return c_error(e);
-  } catch (std::exception& e) {
-    return c_error(loot_error_condition_eval_fail, e.what());
+  } catch (std::exception&) {
+    return c_error(std::current_exception());
   }
 
   return loot_ok;
@@ -237,7 +254,7 @@ LOOT_C_API unsigned int loot_sort_plugins(loot_db * const db,
   using std::distance;
 
   if (db == nullptr || plugins == nullptr)
-    return c_error(loot_error_invalid_args, "Null pointer passed.");
+    return c_error(loot_error_argument, "Null pointer passed.");
 
   if (numPlugins == 0)
     return loot_ok;
@@ -251,12 +268,8 @@ LOOT_C_API unsigned int loot_sort_plugins(loot_db * const db,
 
       return distance(begin(sortedPlugins), aIt) < distance(begin(sortedPlugins), bIt);
     });
-  } catch (Error &e) {
-    return c_error(e);
-  } catch (std::bad_alloc& e) {
-    return c_error(loot_error_no_mem, e.what());
-  } catch (std::exception& e) {
-    return c_error(loot_error_sorting_error, e.what());
+  } catch (std::exception&) {
+    return c_error(std::current_exception());
   }
 
   return loot_ok;
@@ -268,16 +281,14 @@ LOOT_C_API unsigned int loot_update_masterlist(loot_db * const db,
                                                const char * const remoteBranch,
                                                bool * const updated) {
   if (db == nullptr || masterlistPath == nullptr || remoteURL == nullptr || remoteBranch == nullptr || updated == nullptr)
-    return c_error(loot_error_invalid_args, "Null pointer passed.");
+    return c_error(loot_error_argument, "Null pointer passed.");
 
   *updated = false;
 
   try {
     *updated = db->getDatabase()->UpdateMasterlist(masterlistPath, remoteURL, remoteBranch);
-  } catch (Error &e) {
-    return c_error(e);
-  } catch (std::exception& e) {
-    return c_error(loot_error_git_error, e.what());
+  } catch (std::exception&) {
+    return c_error(std::current_exception());
   }
 
   return loot_ok;
@@ -290,7 +301,7 @@ LOOT_C_API unsigned int loot_get_masterlist_revision(loot_db * const db,
                                                      const char ** const revisionDate,
                                                      bool * const isModified) {
   if (db == nullptr || masterlistPath == nullptr || revisionID == nullptr || revisionDate == nullptr || isModified == nullptr)
-    return c_error(loot_error_invalid_args, "Null pointer passed.");
+    return c_error(loot_error_argument, "Null pointer passed.");
 
   *revisionID = nullptr;
   *revisionDate = nullptr;
@@ -306,12 +317,8 @@ LOOT_C_API unsigned int loot_get_masterlist_revision(loot_db * const db,
     db->setRevisionIdString(info.revision_id);
     db->setRevisionDateString(info.revision_date);
     modified = info.is_modified;
-  } catch (Error &e) {
-    return c_error(e);
-  } catch (std::bad_alloc& e) {
-    return c_error(loot_error_no_mem, e.what());
-  } catch (std::exception& e) {
-    return c_error(loot_error_git_error, e.what());
+  } catch (std::exception&) {
+    return c_error(std::current_exception());
   }
 
   *revisionID = db->getRevisionIdString();
@@ -332,7 +339,7 @@ LOOT_C_API unsigned int loot_get_plugin_tags(loot_db * const db, const char * co
                                              size_t * const numTags_removed,
                                              bool * const userlistModified) {
   if (db == nullptr || plugin == nullptr || tagIds_added == nullptr || numTags_added == nullptr || tagIds_removed == nullptr || numTags_removed == nullptr || userlistModified == nullptr)
-    return c_error(loot_error_invalid_args, "Null pointer passed.");
+    return c_error(loot_error_argument, "Null pointer passed.");
 
   //Initialise output.
   *tagIds_added = nullptr;
@@ -347,10 +354,8 @@ LOOT_C_API unsigned int loot_get_plugin_tags(loot_db * const db, const char * co
     db->setAddedTags(tags.added);
     db->setRemovedTags(tags.removed);
     *userlistModified = tags.userlist_modified;
-  } catch (Error& e) {
-    return c_error(e);
-  } catch (std::exception& e) {
-    return c_error(loot_error_parse_fail, e.what());
+  } catch (std::exception&) {
+    return c_error(std::current_exception());
   }
 
   //Set outputs.
@@ -375,7 +380,7 @@ LOOT_C_API unsigned int loot_get_plugin_messages(loot_db * const db,
                                                  const loot_message ** const messages,
                                                  size_t * const numMessages) {
   if (db == nullptr || plugin == nullptr || messages == nullptr || numMessages == nullptr)
-    return c_error(loot_error_invalid_args, "Null pointer passed.");
+    return c_error(loot_error_argument, "Null pointer passed.");
   if (language != loot_lang_english
       && language != loot_lang_spanish
       && language != loot_lang_russian
@@ -386,7 +391,7 @@ LOOT_C_API unsigned int loot_get_plugin_messages(loot_db * const db,
       && language != loot_lang_finnish
       && language != loot_lang_german
       && language != loot_lang_danish)
-    return c_error(loot_error_invalid_args, "Invalid language code given.");
+    return c_error(loot_error_argument, "Invalid language code given.");
 
   //Initialise output.
   *messages = nullptr;
@@ -399,10 +404,8 @@ LOOT_C_API unsigned int loot_get_plugin_messages(loot_db * const db,
       return loot_ok;
 
     db->setPluginMessages(messages);
-  } catch (Error& e) {
-    return c_error(e);
-  } catch (std::exception& e) {
-    return c_error(loot_error_parse_fail, e.what());
+  } catch (std::exception&) {
+    return c_error(std::current_exception());
   }
 
   *messages = &db->getPluginMessages()[0];
@@ -413,16 +416,14 @@ LOOT_C_API unsigned int loot_get_plugin_messages(loot_db * const db,
 
 LOOT_C_API unsigned int loot_get_dirty_info(loot_db * const db, const char * const plugin, unsigned int * const needsCleaning) {
   if (db == nullptr || plugin == nullptr || needsCleaning == nullptr)
-    return c_error(loot_error_invalid_args, "Null pointer passed.");
+    return c_error(loot_error_argument, "Null pointer passed.");
 
   *needsCleaning = loot_cleanliness_unknown;
 
   try {
     *needsCleaning = static_cast<unsigned int>(db->getDatabase()->GetPluginCleanliness(plugin));
-  } catch (Error& e) {
-    return c_error(e);
-  } catch (std::exception& e) {
-    return c_error(loot_error_parse_fail, e.what());
+  } catch (std::exception&) {
+    return c_error(std::current_exception());
   }
 
   return loot_ok;
@@ -434,14 +435,12 @@ LOOT_C_API unsigned int loot_get_dirty_info(loot_db * const db, const char * con
 // for output. If outputFile already exists, it will only be overwritten if overwrite is true.
 LOOT_C_API unsigned int loot_write_minimal_list(loot_db * const db, const char * const outputFile, const bool overwrite) {
   if (db == nullptr || outputFile == nullptr)
-    return c_error(loot_error_invalid_args, "Null pointer passed.");
+    return c_error(loot_error_argument, "Null pointer passed.");
 
   try {
     db->getDatabase()->WriteMinimalList(outputFile, overwrite);
-  } catch (Error& e) {
-    return c_error(e);
-  } catch (std::exception& e) {
-    return c_error(loot_error_file_write_fail, e.what());
+  } catch (std::exception&) {
+    return c_error(std::current_exception());
   }
 
   return loot_ok;

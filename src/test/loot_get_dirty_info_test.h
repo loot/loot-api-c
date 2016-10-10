@@ -50,10 +50,10 @@ INSTANTIATE_TEST_CASE_P(,
                           loot_game_fonv,
                           loot_game_fo4));
 
-TEST_P(loot_get_dirty_info_test, shouldReturnAnInvalidArgsErrorIfAnyOfTheArgumentsAreNull) {
-  EXPECT_EQ(loot_error_invalid_args, loot_get_dirty_info(NULL, blankEsp.c_str(), &needsCleaning_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_dirty_info(db_, NULL, &needsCleaning_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_dirty_info(db_, blankEsp.c_str(), NULL));
+TEST_P(loot_get_dirty_info_test, shouldReturnAnArgumentErrorIfAnyOfTheArgumentsAreNull) {
+  EXPECT_EQ(loot_error_argument, loot_get_dirty_info(NULL, blankEsp.c_str(), &needsCleaning_));
+  EXPECT_EQ(loot_error_argument, loot_get_dirty_info(db_, NULL, &needsCleaning_));
+  EXPECT_EQ(loot_error_argument, loot_get_dirty_info(db_, blankEsp.c_str(), NULL));
 }
 
 TEST_P(loot_get_dirty_info_test, shouldReturnOkAndOutputUnknownForAPluginWithNoDirtyInfo) {

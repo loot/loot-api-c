@@ -44,8 +44,8 @@ INSTANTIATE_TEST_CASE_P(,
                           loot_game_fonv,
                           loot_game_fo4));
 
-TEST_P(loot_eval_lists_test, shouldReturnAnInvalidArgsErrorIfPassedANullPointer) {
-  EXPECT_EQ(loot_error_invalid_args, loot_eval_lists(NULL));
+TEST_P(loot_eval_lists_test, shouldReturnAnArgumentErrorIfPassedANullPointer) {
+  EXPECT_EQ(loot_error_argument, loot_eval_lists(NULL));
 }
 
 TEST_P(loot_eval_lists_test, shouldReturnOkIfDbPointerIsValid) {

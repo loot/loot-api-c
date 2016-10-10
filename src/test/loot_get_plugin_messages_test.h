@@ -52,15 +52,15 @@ INSTANTIATE_TEST_CASE_P(,
                           loot_game_fonv,
                           loot_game_fo4));
 
-TEST_P(loot_get_plugin_messages_test, shouldReturnAnInvalidArgsErrorIfAnyOfTheArgumentsAreNull) {
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(NULL, blankEsp.c_str(), loot_lang_english, &messages_, &numMessages_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(db_, NULL, loot_lang_english, &messages_, &numMessages_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(db_, blankEsp.c_str(), loot_lang_english, NULL, &numMessages_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(db_, blankEsp.c_str(), loot_lang_english, &messages_, NULL));
+TEST_P(loot_get_plugin_messages_test, shouldReturnAnArgumentErrorIfAnyOfTheArgumentsAreNull) {
+  EXPECT_EQ(loot_error_argument, loot_get_plugin_messages(NULL, blankEsp.c_str(), loot_lang_english, &messages_, &numMessages_));
+  EXPECT_EQ(loot_error_argument, loot_get_plugin_messages(db_, NULL, loot_lang_english, &messages_, &numMessages_));
+  EXPECT_EQ(loot_error_argument, loot_get_plugin_messages(db_, blankEsp.c_str(), loot_lang_english, NULL, &numMessages_));
+  EXPECT_EQ(loot_error_argument, loot_get_plugin_messages(db_, blankEsp.c_str(), loot_lang_english, &messages_, NULL));
 }
 
-TEST_P(loot_get_plugin_messages_test, shouldReturnAnInvalidArgsErrorIfTheLanguageIsInvalid) {
-  EXPECT_EQ(loot_error_invalid_args, loot_get_plugin_messages(db_, blankEsp.c_str(), UINT_MAX, &messages_, &numMessages_));
+TEST_P(loot_get_plugin_messages_test, shouldReturnAnArgumentErrorIfTheLanguageIsInvalid) {
+  EXPECT_EQ(loot_error_argument, loot_get_plugin_messages(db_, blankEsp.c_str(), UINT_MAX, &messages_, &numMessages_));
 }
 
 TEST_P(loot_get_plugin_messages_test, shouldReturnOkAndOutputANullArrayIfAPluginWithNoMessagesIsQueried) {

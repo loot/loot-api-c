@@ -31,12 +31,12 @@ along with LOOT.  If not, see
 
 namespace loot {
 namespace test {
-TEST(loot_get_version, shouldReturnAnInvalidArgsErrorIfPassedNullPointers) {
+TEST(loot_get_version, shouldReturnAnArgumentErrorIfPassedNullPointers) {
   unsigned int vMajor, vMinor, vPatch;
-  EXPECT_EQ(loot_error_invalid_args, loot_get_version(&vMajor, NULL, NULL));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_version(NULL, &vMinor, NULL));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_version(NULL, NULL, &vPatch));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_version(NULL, NULL, NULL));
+  EXPECT_EQ(loot_error_argument, loot_get_version(&vMajor, NULL, NULL));
+  EXPECT_EQ(loot_error_argument, loot_get_version(NULL, &vMinor, NULL));
+  EXPECT_EQ(loot_error_argument, loot_get_version(NULL, NULL, &vPatch));
+  EXPECT_EQ(loot_error_argument, loot_get_version(NULL, NULL, NULL));
 }
 
 TEST(loot_get_version, shouldReturnOkIfPassedNonNullPointers) {
@@ -44,8 +44,8 @@ TEST(loot_get_version, shouldReturnOkIfPassedNonNullPointers) {
   EXPECT_EQ(loot_ok, loot_get_version(&vMajor, &vMinor, &vPatch));
 }
 
-TEST(loot_get_build_id, shouldReturnAnInvalidArgsErrorIfPassedANullPointer) {
-  EXPECT_EQ(loot_error_invalid_args, loot_get_build_id(NULL));
+TEST(loot_get_build_id, shouldReturnAnArgumentErrorIfPassedANullPointer) {
+  EXPECT_EQ(loot_error_argument, loot_get_build_id(NULL));
 }
 
 TEST(loot_get_build_id, shouldReturnOkAndOutputANonNullNonPlaceholderRevisionString) {
@@ -69,8 +69,8 @@ TEST(loot_is_compatible, shouldReturnFalseWithEqualMajorVersionAndUnequalMinorAn
   EXPECT_FALSE(loot_is_compatible(vMajor, vMinor + 1, vPatch + 1));
 }
 
-TEST(loot_get_error_message, shouldReturnAnInvalidArgsErrorIfPassedANullPointer) {
-  EXPECT_EQ(loot_error_invalid_args, loot_get_error_message(NULL));
+TEST(loot_get_error_message, shouldReturnAnArgumentErrorIfPassedANullPointer) {
+  EXPECT_EQ(loot_error_argument, loot_get_error_message(NULL));
 
   const char * error;
   EXPECT_EQ(loot_ok, loot_get_error_message(&error));
@@ -83,7 +83,7 @@ TEST(loot_get_error_message, shouldReturnOkIfPassedANonNullPointer) {
 }
 
 TEST(loot_get_error_message, shouldOutputAnErrorMessageDetailingTheLastErrorIfAnErrorHasOccurred) {
-  EXPECT_EQ(loot_error_invalid_args, loot_get_error_message(NULL));
+  EXPECT_EQ(loot_error_argument, loot_get_error_message(NULL));
 
   const char * error;
   EXPECT_EQ(loot_ok, loot_get_error_message(&error));

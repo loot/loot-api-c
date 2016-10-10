@@ -50,7 +50,7 @@ ExternalProject_Add(testing-plugins
 
 ExternalProject_Add(loot_api
                     PREFIX "external"
-                    URL "https://github.com/loot/loot/archive/dc3a93ecf331465b17a28ac39e6c17370438331b.zip"
+                    URL "https://github.com/loot/loot/archive/bd13e011eec08a0a444c3e72192f5f062691ffb7.zip"
                     CMAKE_ARGS -DBOOST_INCLUDEDIR=${Boost_INCLUDE_DIR} -DMSVC_STATIC_RUNTIME=${MSVC_STATIC_RUNTIME} -DBUILD_SHARED_LIBS=OFF
                     BUILD_COMMAND ${CMAKE_COMMAND} --build . --target loot_api --config $(CONFIGURATION)
                     INSTALL_COMMAND "")

@@ -60,24 +60,24 @@ INSTANTIATE_TEST_CASE_P(,
                           loot_game_fonv,
                           loot_game_fo4));
 
-TEST_P(loot_get_masterlist_revision_test, shouldReturnAnInvalidArgsErrorIfAnyOfTheArgumentsAreNull) {
-  EXPECT_EQ(loot_error_invalid_args, loot_get_masterlist_revision(NULL, masterlistPath.string().c_str(), false, &revisionId_, &revisionDate_, &isModified_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_masterlist_revision(db_, NULL, false, &revisionId_, &revisionDate_, &isModified_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_masterlist_revision(db_, masterlistPath.string().c_str(), false, NULL, &revisionDate_, &isModified_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_masterlist_revision(db_, masterlistPath.string().c_str(), false, &revisionId_, NULL, &isModified_));
-  EXPECT_EQ(loot_error_invalid_args, loot_get_masterlist_revision(db_, masterlistPath.string().c_str(), false, &revisionId_, &revisionDate_, NULL));
+TEST_P(loot_get_masterlist_revision_test, shouldReturnAnArgumentErrorIfAnyOfTheArgumentsAreNull) {
+  EXPECT_EQ(loot_error_argument, loot_get_masterlist_revision(NULL, masterlistPath.string().c_str(), false, &revisionId_, &revisionDate_, &isModified_));
+  EXPECT_EQ(loot_error_argument, loot_get_masterlist_revision(db_, NULL, false, &revisionId_, &revisionDate_, &isModified_));
+  EXPECT_EQ(loot_error_argument, loot_get_masterlist_revision(db_, masterlistPath.string().c_str(), false, NULL, &revisionDate_, &isModified_));
+  EXPECT_EQ(loot_error_argument, loot_get_masterlist_revision(db_, masterlistPath.string().c_str(), false, &revisionId_, NULL, &isModified_));
+  EXPECT_EQ(loot_error_argument, loot_get_masterlist_revision(db_, masterlistPath.string().c_str(), false, &revisionId_, &revisionDate_, NULL));
 }
 
-TEST_P(loot_get_masterlist_revision_test, shouldSucceedIfNoMasterlistIsPresent) {
-  EXPECT_EQ(loot_ok, loot_get_masterlist_revision(db_, masterlistPath.string().c_str(), false, &revisionId_, &revisionDate_, &isModified_));
+TEST_P(loot_get_masterlist_revision_test, shouldReturnAFileAccessErrorIfNoMasterlistIsPresent) {
+  EXPECT_EQ(loot_error_file_access, loot_get_masterlist_revision(db_, masterlistPath.string().c_str(), false, &revisionId_, &revisionDate_, &isModified_));
   EXPECT_EQ(NULL, revisionId_);
   EXPECT_EQ(NULL, revisionDate_);
   EXPECT_FALSE(isModified_);
 }
 
-TEST_P(loot_get_masterlist_revision_test, shouldSucceedIfANonVersionControlledMasterlistIsPresent) {
+TEST_P(loot_get_masterlist_revision_test, shouldReturnAGitStateErrorIfANonVersionControlledMasterlistIsPresent) {
   ASSERT_NO_THROW(GenerateMasterlist());
-  EXPECT_EQ(loot_ok, loot_get_masterlist_revision(db_, masterlistPath.string().c_str(), false, &revisionId_, &revisionDate_, &isModified_));
+  EXPECT_EQ(loot_error_git_state, loot_get_masterlist_revision(db_, masterlistPath.string().c_str(), false, &revisionId_, &revisionDate_, &isModified_));
   EXPECT_EQ(NULL, revisionId_);
   EXPECT_EQ(NULL, revisionDate_);
   EXPECT_FALSE(isModified_);
