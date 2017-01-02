@@ -1,0 +1,30 @@
+os: Visual Studio 2015
+
+version: "{build}-{branch}"
+
+configuration: Release
+
+cache:
+  - C:\projects\boost_1_61_0\boost
+  - C:\projects\boost_1_61_0\stage\32\lib
+
+install:
+  - ps: (New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/WrinklyNinja/ci-scripts/1.1.0/install_boost.py', "$env:APPVEYOR_BUILD_FOLDER\install_boost.py")
+  - ps: python $env:APPVEYOR_BUILD_FOLDER\install_boost.py -d C:\projects -b 1.61.0 -a 32 atomic chrono date_time filesystem iostreams locale log regex system thread
+
+before_build:
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - ps: mkdir build
+  - cd build
+  - cmake .. -G "Visual Studio 14 2015" -DBOOST_ROOT="C:\projects\boost_1_61_0" -DBOOST_LIBRARYDIR="C:\projects\boost_1_61_0\stage\32\lib"
+
+build:
+  verbosity: minimal
+  project: '$(APPVEYOR_BUILD_FOLDER)\build\loot_api_c.sln'
+
+test_script:
+  - cd %APPVEYOR_BUILD_FOLDER%\build\%CONFIGURATION%
+  - c_api_tests.exe --gtest_output=xml:c_api_tests.xml
+
+on_finish:
+  - ps: (New-Object System.Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", "$($env:APPVEYOR_BUILD_FOLDER)\build\$($env:CONFIGURATION)\c_api_tests.xml")

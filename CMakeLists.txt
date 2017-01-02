@@ -50,9 +50,9 @@ ExternalProject_Add(testing-plugins
 
 ExternalProject_Add(loot_api
                     PREFIX "external"
-                    URL "https://github.com/loot/loot/archive/0.10.2.zip"
+                    URL "https://github.com/loot/loot/archive/5c7fc7b1dcb60d02de3b69226c9ed335684f185b.zip"
                     PATCH_COMMAND python "${CMAKE_SOURCE_DIR}/scripts/remove_resource_icon.py"
-                    CMAKE_ARGS -DBOOST_INCLUDEDIR=${Boost_INCLUDE_DIR} -DMSVC_STATIC_RUNTIME=${MSVC_STATIC_RUNTIME} -DBUILD_SHARED_LIBS=OFF
+                    CMAKE_ARGS -DBOOST_ROOT=${BOOST_ROOT} -DBOOST_LIBRARYDIR=${BOOST_LIBRARYDIR} -DMSVC_STATIC_RUNTIME=${MSVC_STATIC_RUNTIME} -DBUILD_SHARED_LIBS=OFF
                     BUILD_COMMAND ${CMAKE_COMMAND} --build . --target loot_api --config $(CONFIGURATION)
                     INSTALL_COMMAND "")
 ExternalProject_Get_Property(loot_api SOURCE_DIR BINARY_DIR)
