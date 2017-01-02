@@ -35,7 +35,7 @@ class loot_get_masterlist_revision_test : public ApiGameOperationsTest {
 protected:
   loot_get_masterlist_revision_test() :
     url_("https://github.com/loot/testing-metadata.git"),
-    branch_("2.x"),
+    branch_("master"),
     revisionId_("foo"),
     revisionDate_("bar"),
     isModified_(true),

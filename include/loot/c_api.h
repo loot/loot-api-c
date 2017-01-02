@@ -269,6 +269,7 @@ extern "C"
 
   LOOT_C_API extern const unsigned int loot_game_tes4;  /**< Game code for The Elder Scrolls IV: Oblivion. */
   LOOT_C_API extern const unsigned int loot_game_tes5;  /**< Game code for The Elder Scrolls V: Skyrim. */
+  LOOT_C_API extern const unsigned int loot_game_tes5se;  /**< Game code for The Elder Scrolls V: Skyrim. */
   LOOT_C_API extern const unsigned int loot_game_fo3;  /**< Game code for Fallout 3. */
   LOOT_C_API extern const unsigned int loot_game_fonv;  /**< Game code for Fallout: New Vegas. */
   LOOT_C_API extern const unsigned int loot_game_fo4;  /**< Game code for Fallout: New Vegas. */

@@ -35,7 +35,7 @@ class loot_update_masterlist_test : public ApiGameOperationsTest {
 protected:
   loot_update_masterlist_test() :
     url_("https://github.com/loot/testing-metadata.git"),
-    branch_("2.x"),
+    branch_("master"),
     updated_(false) {}
 
   inline void TearDown() {
@@ -97,6 +97,10 @@ TEST_P(loot_update_masterlist_test, shouldSucceedIfPassedValidParametersAndOutpu
   EXPECT_EQ(loot_ok, loot_update_masterlist(db_, masterlistPath.string().c_str(), url_.c_str(), branch_.c_str(), &updated_));
   EXPECT_TRUE(updated_);
   EXPECT_TRUE(boost::filesystem::exists(masterlistPath));
+
+  const char * error;
+  loot_get_error_message(&error);
+  std::cout << error << std::endl;
 }
 
 TEST_P(loot_update_masterlist_test, shouldSucceedIfCalledRepeatedlyButOnlyOutputTrueForTheFirstCall) {

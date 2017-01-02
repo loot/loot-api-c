@@ -53,6 +53,7 @@ const unsigned int loot_return_max = loot_error_argument;
 // The following are the games identifiers used by the API.
 const unsigned int loot_game_tes4 = static_cast<unsigned int>(GameType::tes4);
 const unsigned int loot_game_tes5 = static_cast<unsigned int>(GameType::tes5);
+const unsigned int loot_game_tes5se = static_cast<unsigned int>(GameType::tes5se);
 const unsigned int loot_game_fo3 = static_cast<unsigned int>(GameType::fo3);
 const unsigned int loot_game_fonv = static_cast<unsigned int>(GameType::fonv);
 const unsigned int loot_game_fo4 = static_cast<unsigned int>(GameType::fo4);
@@ -176,6 +177,14 @@ LOOT_C_API unsigned int loot_create_db(loot_db ** const db,
                                        const char * const gameLocalPath) {
   if (db == nullptr)
     return c_error(loot_error_argument, "Null pointer passed.");
+  if (GameType(clientGame) != GameType::tes4
+      && GameType(clientGame) != GameType::tes5
+      && GameType(clientGame) != GameType::fo3
+      && GameType(clientGame) != GameType::fonv
+      && GameType(clientGame) != GameType::fo4
+      && GameType(clientGame) != GameType::tes5se) {
+    return c_error(loot_error_argument, "Invalid game type passed.");
+  }
 
   std::string game_path = "";
   if (gamePath != nullptr)
@@ -190,7 +199,7 @@ LOOT_C_API unsigned int loot_create_db(loot_db ** const db,
 #endif
 
   try {
-    *db = new loot_db(loot::GameType(clientGame), game_path, game_local_path);
+    *db = new loot_db(GameType(clientGame), game_path, game_local_path);
   } catch (std::exception&) {
     return c_error(std::current_exception());
   }
