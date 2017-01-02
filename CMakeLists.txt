@@ -196,14 +196,14 @@ endif ()
 
 # Copy testing metadata
 ExternalProject_Get_Property(testing-metadata SOURCE_DIR)
-add_custom_command(TARGET loot_c_api POST_BUILD
+add_custom_command(TARGET c_api_tests POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${SOURCE_DIR}
         "$<TARGET_FILE_DIR:loot_c_api>/testing-metadata")
 
 # Copy testing plugins
 ExternalProject_Get_Property(testing-plugins SOURCE_DIR)
-add_custom_command(TARGET loot_c_api POST_BUILD
+add_custom_command(TARGET c_api_tests POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${SOURCE_DIR}
         $<TARGET_FILE_DIR:loot_c_api>)
