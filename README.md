@@ -1,6 +1,8 @@
 LOOT API C Wrapper
 ==================
 
+**Note: No longer maintained. If you're interested in using the LOOT API in languages other than C++ and Python, file an issue in the [loot-api issue tracker](https://github.com/loot/loot-api/issues).**
+
 A wrapper library for LOOT's C++ API that provides it as a C API.
 
 ## Build Instructions
